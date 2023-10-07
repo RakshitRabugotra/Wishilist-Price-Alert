@@ -4,15 +4,22 @@
     {% block head %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Author: Rakshit Rabugotra,
+    Category: Shopping helper, For: Amazon">
+    <link rel= "stylesheet" type= "text/css" href="static/style.css">
     <title>{% block title %}{% endblock %}</title>
     {% endblock %}
   </head>
   <body>
-    <div id="content">{% block content %}{%endblock%}</div>
-    <div id="footer">
-        {%block footer%}
+    <div class="header">
+      {% block header %}
+      {% endblock header %}
+    </div>
+    <div id="content">{% block content %}{% endblock content%}</div>
+    <div class="footer">
+        {% block footer %}
         &copy; Copyright 2023 by <a href="#">Rakshit Rabugotra</a>
-        {%endblock%}
+        {% endblock %}
     </div>
   </body>
 </html>

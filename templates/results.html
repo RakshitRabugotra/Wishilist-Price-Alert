@@ -1,0 +1,19 @@
+{% extends "layout/default.html" %} {% block content %} {% if data %}
+<h1 class="heading">DATA!!</h1>
+
+<table class="result-table">
+  {% for field_name, field_data in data.items() %}
+  <tr>
+    <td class="field-name">{{field_name}}</td>
+    {% if field_name == "image" %}
+        <td class="field-data img" style="background-image: url('{{field_data}}')"></td>
+    {% else %}
+        <td class="field-data">{{field_data}}</td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+</table>
+
+<button>Get updates</button>
+
+{% else %} {{redirect(url_for("/"))}} {% endif %} {% endblock content %}

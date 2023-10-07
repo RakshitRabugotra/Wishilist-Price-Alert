@@ -1,0 +1,109 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
+
+:root {
+  --color-1: #e7eaf6;
+  --color-2: #a2a8d3;
+  --color-3: #38598b;
+  --color-4: #272343;
+  --color-5: #fb8a8a;
+  --color-6: #0f0f0f;
+
+  /* Alpha variations */
+  --color-3-a: #38598bc4;
+  --color-5-a: #f99f9f88;
+
+  /* Font sizes */
+  --fs-1: 3.4rem;
+  --fs-2: 1.6rem;
+  --fs-3: 1.2rem;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif;
+  margin: 0px;
+  padding: 0px;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-4);
+}
+
+.heading {
+  text-align: center;
+  text-transform: capitalize;
+  margin: 1rem 0px;
+  color: var(--color-2);
+  font-size: var(--fs-1);
+}
+
+#content {
+  width: 100%;
+  padding: 0px 1rem;
+}
+
+.footer {
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-1);
+  background-color: var(--color-4-a);
+}
+
+.footer a {
+  text-decoration: none;
+  text-transform: capitalize;
+  color: var(--color-5);
+}
+
+.footer a:hover {
+  color: var(--color-5-a);
+}
+
+#content {
+	text-align: center;
+}
+
+#content form {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+input[type="text"] {
+  font-size: var(--fs-3);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--color-1);
+  color: var(--color-6);
+  width: 100%;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+}
+
+input[type="submit"], button {
+  background-color: var(--color-5);
+  border: none;
+  color: var(--color-6);
+  border-radius: 12px;
+  font-size: var(--fs-2);
+  font-weight: bold;
+  width: fit-content;
+  padding: 8px 48px;
+}
+
+input:is(:hover, :focus) {
+  outline-color: var(--color-3);
+}
