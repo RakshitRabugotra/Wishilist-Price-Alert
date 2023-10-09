@@ -5,11 +5,13 @@
 {% endblock title %}
 
 {% block content %}
-    <h1 class="heading">Enter Item</h1>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        {{ form.item_url(placeholder="Item URL") }}
-
-        {{ form.submit() }}
-    </form>
+    <div class="container form">
+        <h1 class="heading">Enter Item</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.item_url(placeholder="Item URL") }}
+    
+            {{ form.submit() }}
+        </form>
+    </div>
 {% endblock content %}

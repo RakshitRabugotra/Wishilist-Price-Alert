@@ -13,7 +13,7 @@
   --color-5-a: #f99f9f88;
 
   /* Font sizes */
-  --fs-1: 3.4rem;
+  --fs-1: 3.1rem;
   --fs-2: 1.6rem;
   --fs-3: 1.2rem;
 }
@@ -46,6 +46,11 @@ body {
 }
 
 #content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 95vh;
   width: 100%;
   padding: 0px 1rem;
 }
@@ -54,28 +59,46 @@ body {
   bottom: 0px;
   left: 0px;
   width: 100%;
-  padding: 2rem;
+  height: 5vh;
+  padding: 0.5rem;
   text-align: center;
   color: var(--color-1);
   background-color: var(--color-4-a);
 }
 
 .footer a {
-  text-decoration: none;
+  text-underline-offset: 0.25em;
+  text-decoration-style: dotted;
   text-transform: capitalize;
   color: var(--color-5);
 }
 
-.footer a:hover {
-  color: var(--color-5-a);
-}
-
-#content {
-	text-align: center;
-}
-
-#content form {
+/* Result container */
+.container {
   display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.container.result {
+  justify-content: space-around;
+}
+
+.container.form {
+  justify-content: center;
+}
+
+/* Image holder */
+.item-image-holder img {
+  border-radius: 8px;
+}
+
+.form form {
+  display: flex;
+  width: 100%;
   flex-direction: column;
   flex-wrap: wrap;
   align-items: center;
@@ -93,17 +116,64 @@ input[type="text"] {
   padding: 0.5rem 1rem;
 }
 
-input[type="submit"], button {
+input[type="submit"],
+button {
   background-color: var(--color-5);
   border: none;
   color: var(--color-6);
   border-radius: 12px;
   font-size: var(--fs-2);
   font-weight: bold;
+  text-transform: capitalize;
   width: fit-content;
   padding: 8px 48px;
 }
 
 input:is(:hover, :focus) {
   outline-color: var(--color-3);
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #272343;
+  color: #fff;
+  filter: drop-shadow(1px 1px 3px var(--color-2));
+  border-radius: 8px;
+}
+
+table .field-name,
+table .table-heading {
+  text-transform: capitalize;
+  font-weight: bold;
+}
+
+th {
+  background-color: #1e1f38;
+  color: #fff;
+  text-align: left;
+  padding: 10px;
+  border: 1px solid #555;
+}
+
+td {
+  padding: 10px;
+  border: 1px solid #555;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #2b2d52;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #272648;
+}
+
+table {
+  color: #fff;
+}
+
+tr:hover {
+  background-color: #303262;
 }

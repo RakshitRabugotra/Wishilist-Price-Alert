@@ -3,7 +3,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from config import ApplicationConfig
-from scrapper import Scrapper
+from scraper import Scraper
+from logger import logger
 
 # Initialize the app
 app = Flask(__name__)
@@ -37,21 +38,42 @@ def index():
     if form.validate_on_submit():
         item_url = form.item_url.data
         form.item_url.data = ""
-        print("[DEBUG]: item_url: ", item_url)
-    
+
     # If we have item_url on our hand, then scrap the shit out of it
     if item_url is not None:
         # Get ready with the scrapper
-        scrapper = Scrapper(item_url)
+        scrapper = Scraper(item_url)
 
         # If we couldn't scrap, then we have some error
         if not scrapper.is_active:
             return render_template("error.html", error="Couldn't parse the URL")
-        
+
         # Else save the data we get, and show results
         data = scrapper.get()
-        print("[DEBUG]: (DATA): ", data)
-        return render_template("results.html", data=data)
+        # Log that we successfully fetched the data
+        logger.info(f"Data successfully fetched - data: {data['title'].strip()}")
+
+        # Extract the image
+        image = data["image"]
+        del data["image"]
+
+        # And extract the price
+        price = data["price symbol"] + " " + data["price"]
+        del data["price symbol"]
+        del data["price"]
+
+        # Convert all other info to text
+        for field_name, field_value in data.items():
+            data[field_name] = (
+                isinstance(field_value, str) and field_value or field_value.text()
+            )
+
+        # Check if the item is unavailable
+        availability = data["availability"]
+        if "unavailable" in availability:
+            data["availability"] = "Currently Unavailable"
+
+        return render_template("results.html", data=data, image=image, price=price)
 
     # If we don't have any url, then just show the base index page
     return render_template("index.html", item_url=item_url, form=form)

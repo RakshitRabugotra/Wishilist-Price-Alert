@@ -18,6 +18,9 @@ build/
 docs/_build/
 .vscode
 
+# logs
+*.log
+
 # Coverage reports
 htmlcov/
 .coverage
