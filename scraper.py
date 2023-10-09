@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from logger import logger
 
 AMAZON_ITEMS = {
     "title": "span#productTitle",
@@ -10,7 +11,7 @@ AMAZON_ITEMS = {
 }
 
 
-class Scrapper:
+class Scraper:
     # Headers for the request
     HEADERS = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"
@@ -76,10 +77,16 @@ class Scrapper:
             if attrs["class"] is None:
                 del attrs["class"]
 
-            print("Searching for: ", {"field": field_name, "attrs": attrs})
+            # Log the details
+            logger.info(f"Searching for: 'field': {field_name} | 'attrs': {str(attrs)}")
 
             # Search for this element and return the result to results
             result_object = self.soup.find(element_type, attrs=attrs)
+
+            # Check if the element is None
+            if result_object is None:
+                results[field_name] = ""
+                continue
 
             if element_type == "img":
                 results[field_name] = result_object['src']
