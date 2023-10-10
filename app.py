@@ -1,10 +1,15 @@
-from flask import Flask, render_template, session, redirect
+from flask import Flask, render_template, session, redirect, jsonify, url_for
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from flask_bcrypt import Bcrypt
+from wtforms import StringField, SubmitField, PasswordField, EmailField
+from wtforms.validators import DataRequired, Email
+from job_handler import write_to_database
+from models import db, User
 from config import ApplicationConfig
+from flask_migrate import Migrate
 from scraper import Scraper
 from logger import logger
+from utils import format_data
 
 # Initialize the app
 app = Flask(__name__)
@@ -12,6 +17,15 @@ app = Flask(__name__)
 # Set the configurations from external object
 app.config.from_object(ApplicationConfig)
 
+# Initialize the password hash object
+bcrypt = Bcrypt(app)
+
+# Initialize the Database
+db.init_app(app)
+with app.app_context():
+    db.create_all()
+# Initialize the migrator
+migrate = Migrate(app, db)
 
 """
 Forms
@@ -23,6 +37,19 @@ class InfoForm(FlaskForm):
     submit = SubmitField()
 
 
+class LoginForm(FlaskForm):
+    usermail = EmailField("Email Address", validators=[DataRequired(), Email()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField()
+
+
+class RegisterForm(FlaskForm):
+    usermail = EmailField("Email Address", validators=[DataRequired(), Email()])
+    username = StringField("Your name", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField()
+
+
 """
 Endpoints
 """
@@ -30,6 +57,10 @@ Endpoints
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+
+    if session.get("user_id") is None:
+        return redirect("/login")
+
     # Fetch the url from the page
     item_url = None
     form = InfoForm()
@@ -50,33 +81,126 @@ def index():
 
         # Else save the data we get, and show results
         data = scrapper.get()
+
+        # Format the data
+        data, image, price = format_data(data)
         # Log that we successfully fetched the data
         logger.info(f"Data successfully fetched - data: {data['title'].strip()}")
 
-        # Extract the image
-        image = data["image"]
-        del data["image"]
+        # Add the url of the product to the data
+        data['url'] = item_url
 
-        # And extract the price
-        price = data["price symbol"] + " " + data["price"]
-        del data["price symbol"]
-        del data["price"]
+        # Save the data to the database
+        if write_to_database(data=data, user_id=session["user_id"], price=price, image=image):
+            logger.info("Data saved to database successfully")
 
-        # Convert all other info to text
-        for field_name, field_value in data.items():
-            data[field_name] = (
-                isinstance(field_value, str) and field_value or field_value.text()
-            )
-
-        # Check if the item is unavailable
-        availability = data["availability"]
-        if "unavailable" in availability:
-            data["availability"] = "Currently Unavailable"
+        # Remove the url attribute
+        del data['url']
 
         return render_template("results.html", data=data, image=image, price=price)
 
     # If we don't have any url, then just show the base index page
     return render_template("index.html", item_url=item_url, form=form)
+
+
+"""
+Login and Sign-up endpoints
+"""
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register_user():
+    email = None
+    username = None
+    password = None
+
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        email = form.usermail.data
+        username = form.username.data
+        password = form.password.data
+
+    # Check if the user already exists?
+    user_exists = User.query.filter_by(email=email).first() is not None
+
+    if user_exists:
+        logger.error(f"User already exists, Email: {email}, Username: {username}")
+        # User already exists
+        return jsonify({"error": "User already exists"}), 409
+
+    # Else create a new user
+    if email is not None and username is not None and password is not None:
+        hashed_passwd = bcrypt.generate_password_hash(password)
+        # Create a new user and add to the Database
+        new_user = User(email=email, password=hashed_passwd, username=username)
+        db.session.add(new_user)
+        # Save the changes permanently
+        db.session.commit()
+
+        # Log the user in on new registration
+        session["user_id"] = new_user.id
+
+        logger.info(f"User logged in, Email: {email}, Username: {username}")
+
+        # Redirect to homepage
+        return redirect("/")
+
+    return render_template("/user/register.html", form=form)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login_user():
+    usermail = None
+    passwd = None
+
+    # Initialize the form
+    form = LoginForm()
+
+    # If the form is validated successfully
+    if form.validate_on_submit():
+        usermail = form.usermail.data
+        passwd = form.password.data
+
+        # Reset these fields
+        form.password.data = ""
+
+    # If we have user-mail and password, then check if this user exists?
+    user = User.query.filter_by(email=usermail).first()
+
+    if user is None and (usermail is not None and passwd is not None):
+        # Then return an unauthorized response
+        logger.error(f"User not found for email={usermail}")
+        return render_template("user/login.html", form=form, error="User not found!")
+
+    if user is not None:
+        if not bcrypt.check_password_hash(user.password, passwd):
+            # Unauthorized access
+            logger.error(f"Password is wrong for email={usermail}")
+            return render_template(
+                "user/login.html", form=form, error="Password is wrong!"
+            )
+
+        # Set the session
+        session["user_id"] = user.id
+        # Redirect to the home page
+        return redirect("/")
+
+    # Redirect to home page
+    return render_template("user/login.html", form=form)
+
+
+@app.route("/logout", methods=["GET", "POST"])
+def logout_user():
+    # Logout the user
+    session.pop("user_id", None)
+    # Redirect to the home page
+    return redirect("/")
+
+
+"""
+Scrap endpoint to fetch the product
+"""
 
 
 @app.route("/scrap", methods=["POST"])

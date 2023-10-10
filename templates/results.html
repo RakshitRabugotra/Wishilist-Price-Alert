@@ -33,4 +33,12 @@
   <button>Get updates</button>
 </div>
 
-{% else %} {{redirect(url_for("/"))}} {% endif %} {% endblock content %}
+{% else %} 
+  {{redirect(url_for("/"))}} 
+{% endif %} 
+
+{% endblock content %}
+
+{% block extraFooterContent %}
+  <a class="href-btn" href="/">Go back</a>
+{% endblock extraFooterContent %}
