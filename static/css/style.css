@@ -7,6 +7,7 @@
   --color-4: #272343;
   --color-5: #fb8a8a;
   --color-6: #0f0f0f;
+  --color-7: #ee4b2b;
 
   /* Alpha variations */
   --color-3-a: #38598bc4;
@@ -16,6 +17,7 @@
   --fs-1: 3.1rem;
   --fs-2: 1.6rem;
   --fs-3: 1.2rem;
+  --fs-4: 1rem;
 }
 
 * {
@@ -37,6 +39,23 @@ body {
   background: var(--color-4);
 }
 
+.important {
+  color: var(--color-6);
+  background-color: var(--color-1);
+  border-radius: 12px;
+  width: max-content;
+  height: max-content;
+  text-align: center;
+  padding: 10px 24px;
+}
+
+.user-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
 .heading {
   text-align: center;
   text-transform: capitalize;
@@ -56,21 +75,33 @@ body {
 }
 
 .footer {
+  display: flex;
+  flex-direction: column;
   bottom: 0px;
   left: 0px;
   width: 100%;
-  height: 5vh;
   padding: 0.5rem;
   text-align: center;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   color: var(--color-1);
   background-color: var(--color-4-a);
 }
 
-.footer a {
+a {
   text-underline-offset: 0.25em;
   text-decoration-style: dotted;
   text-transform: capitalize;
   color: var(--color-5);
+}
+
+a.href-btn {
+  background: linear-gradient(180deg, rgb(9, 9, 29),rgba(27, 3, 3, 0.603));
+  padding: 10px 24px;
+  width: max-content;
+  font-size: var(--fs-4);
+  border-radius: 12px;
 }
 
 /* Result container */
@@ -88,6 +119,7 @@ body {
 }
 
 .container.form {
+  position: relative;
   justify-content: center;
 }
 
@@ -106,7 +138,24 @@ body {
   margin-top: 2rem;
 }
 
-input[type="text"] {
+.form .form-error {
+  position: absolute;
+  bottom: 0px;
+  margin-bottom: 2rem;
+  color: var(--color-1);
+  font-weight: bold;
+  font-size: var(--fs-3);
+  text-align: center;
+  border-radius: 8px;
+  width: 100%;
+  height: max-content;
+  padding: 10px 24px;
+  background-color: var(--color-3);
+}
+
+input[type="text"], 
+input[type="password"],
+input[type="email"] {
   font-size: var(--fs-3);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--color-1);
@@ -122,11 +171,16 @@ button {
   border: none;
   color: var(--color-6);
   border-radius: 12px;
-  font-size: var(--fs-2);
+  font-size: var(--fs-3);
   font-weight: bold;
   text-transform: capitalize;
   width: fit-content;
   padding: 8px 48px;
+}
+
+button.logout-btn {
+  background-color: var(--color-7);
+  color: vaR(--color-1);
 }
 
 input:is(:hover, :focus) {
