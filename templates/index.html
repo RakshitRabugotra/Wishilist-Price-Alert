@@ -4,6 +4,12 @@
     Home
 {% endblock title %}
 
+{% block header %}
+<div class="user-circle">
+        
+</div>
+{% endblock header %}
+
 {% block content %}
     <div class="container form">
         <h1 class="heading">Enter Item</h1>
@@ -13,5 +19,11 @@
     
             {{ form.submit() }}
         </form>
+
     </div>
+    
 {% endblock content %}
+
+{% block extraFooterContent %}
+    <button class="logout-btn" onclick="logout()">Logout</button>
+{% endblock extraFooterContent %}

@@ -1,16 +1,12 @@
-{% extends "index.html" %} 
-{% block title %}Error-404{%endblock%}
-{% block head%}
-    {{ super() }}
-    <style type="text/css">
-    .important {
-        color: #336699;
-    }
-</style>
+{% extends "layout/default.html" %} 
+
+{% block title %}
+Error-404
 {% endblock %}
+
 {% block content%}
     <h1>Error - Page not found!</h1>
     <p class="important">
-    Page you're looking for is not available, Go <a href="/">Home</a>
+        Page you're looking for is not available, Go <a href="/">Home</a>
     </p>
 {% endblock %}

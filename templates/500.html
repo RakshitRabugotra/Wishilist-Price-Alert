@@ -1,16 +1,12 @@
-{% extends "index.html" %} 
-{% block title %}Error-500{%endblock%}
-{% block head%}
-    {{ super() }}
-    <style type="text/css">
-    .important {
-        color: #336699;
-    }
-</style>
-{% endblock %}
-{% block content%}
+{% extends "layout/default.html" %} 
+
+{% block title %}
+Error-500
+{% endblock title %}
+
+{% block content %}
     <h1>Internal Server Error</h1>
     <p class="important">
         Go <a href="/">Home</a>
     </p>
-{% endblock %}
+{% endblock content %}
