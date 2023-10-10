@@ -1,4 +1,4 @@
-from models import db, Products, PriceHistory
+from models import now, get_uuid, db, Products, PriceHistory
 from logger import logger
 from scraper import Scraper
 from utils import format_data, format_price
@@ -73,13 +73,41 @@ def write_to_database(data: dict, user_id: str, price: str, image: str):
     return True
 
 
-def fetch_routine(engine):
+def fetch_routine():
+    import sqlite3
+
+    sqliteConnection = None
+    cursor = None
+    try:
+        sqliteConnection = sqlite3.connect("./instance/db.sqlite")
+        cursor = sqliteConnection.cursor()
+        logger.info("Connection to database for fetch routine - Successful")
+
+    except Exception as e:
+        sqliteConnection = None
+        cursor = None
+        logger.error(f"Connection to database for fetch routine - Failed, error={str(e)}")
+
+
+    # If we couldn't open the connection then return
+    if sqliteConnection is None or cursor is None: return
+
     # Get all the unique products and fetch their latest prices
-    products = Products.query.all()
-    
+    cursor.execute("SELECT * FROM products")
+    # Get all of the values in form of tuple of tuple
+    products = cursor.fetchall()
+    # Get all of the field values form the Products table
+    fields = Products.get_fields()
+
+    products = list(map(
+        # Convert it to dict for easy access
+        lambda product: dict(zip(fields, product)),
+        products
+    ))
+
     for product in products:
         # Get ready with the scrapper
-        scrapper = Scraper(product.url)
+        scrapper = Scraper(product['url'])
 
         # If we couldn't scrap, then we have some error
         if not scrapper.is_active:
@@ -91,24 +119,28 @@ def fetch_routine(engine):
 
         # Format the data
         data, image, price = format_data(data)
-
+        price = format_price(price)
+        # Check if the price is not given, then make it 0
+        price = int(price) if price else 0
+     
         # Log that we successfully fetched the data
-        logger.info(f"(routine) Data successfully fetched - data: {data['title'].strip()}")
+        logger.info(f"(routine) Data successfully fetched: data={str(data)}, price={price}")
 
-        # Save the data to the database
-        # engine.execute()
-        # if write_to_database(data=data, price=price, image=image):
-            # logger.info("(routine) Data updated successfully")
-        
+        # Update the prices to the database
+        cursor.execute(f"UPDATE products SET latest_price={price} WHERE id='{product['id']}'")
+        logger.info(f"Updated price value for id={product['id']}, url={product['url']} updated latest_price={price}")
+
+        # Update the history table
+        command = f"INSERT INTO priceHistory (history_id, product_id, price, date) VALUES(?, ?, ?, ?)"
+        cursor.execute(command, (get_uuid(), product['id'], price, now()))
+        logger.info(f"Update history for product_id={product['id']}, price={price}")
+
+        # Commit the changes
+        sqliteConnection.commit()
+
     return
 
 
 if __name__ == "__main__":
-    pass
-
-    # from SQLAlchemy import create_engine
-    # db_uri = r"sqlite:///./db.sqlite"
-    # eng = create_engine(db_uri)
-
-    # # Fetch and update all the records
-    # fetch_routine(eng)
+    # Fetch and update all the records
+    fetch_routine()

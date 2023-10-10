@@ -41,7 +41,7 @@ class Scraper:
             id_specifier_index = html_element.find("#")
             # First occurrence of Class specifier '.'
             class_specifier_index = html_element.find(".")
-            print("CLASS-SPEC:", class_specifier_index)
+            
             # Get the class of the element
             element_classes = None
             if class_specifier_index > 0:
@@ -49,7 +49,6 @@ class Scraper:
                     ".", " "
                 )
 
-            print("ELEMENT-CLASS: ", element_classes)
             # Get the id the of the element
             element_id = None
             if id_specifier_index > 0:
