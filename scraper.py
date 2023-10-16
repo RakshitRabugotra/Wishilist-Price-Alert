@@ -38,8 +38,13 @@ class Scraper:
         request_object = requests.get(url=url, headers=self.HEADERS)
         # Get the content
         self.content = request_object.content
+
         # Make a soup object
         self.soup = BeautifulSoup(self.content, "html5lib")
+
+        # Log the content
+        logger.info(f"CONTENT for url={url}: \n{self.soup.prettify('utf-8')}")
+
         # The scrapper is active
         self.is_active = True
 
