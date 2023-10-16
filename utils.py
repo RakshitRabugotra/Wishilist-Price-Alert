@@ -33,6 +33,8 @@ def format_data(data: dict) -> tuple:
     availability = data["availability"]
     if "unavailable" in availability:
         data["availability"] = "Currently Unavailable"
+        data["price"] = None
+        price = "0"
 
     # Delete the [price, image] from the dictionary and pass it separately
     del data["price"]

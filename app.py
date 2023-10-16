@@ -1,8 +1,8 @@
-from flask import Flask, render_template, session, redirect, jsonify, url_for
+from flask import Flask, render_template, session, redirect, jsonify, flash, url_for
 from flask_wtf import FlaskForm
 from flask_bcrypt import Bcrypt
-from wtforms import StringField, SubmitField, PasswordField, EmailField
-from wtforms.validators import DataRequired, Email
+from wtforms import StringField, SubmitField, PasswordField, EmailField, IntegerField
+from wtforms.validators import DataRequired, Email, NumberRange
 from job_handler import write_to_database
 from models import db, User
 from config import ApplicationConfig
@@ -27,11 +27,13 @@ with app.app_context():
 # Initialize the migrator
 migrate = Migrate(app, db)
 
+
+# The URL of the item to get info of
+URL = ""
+
 """
 Forms
 """
-
-
 class InfoForm(FlaskForm):
     item_url = StringField("The URL of Amazon item", validators=[DataRequired()])
     submit = SubmitField()
@@ -50,13 +52,17 @@ class RegisterForm(FlaskForm):
     submit = SubmitField()
 
 
+class TargetPriceForm(FlaskForm):
+    target_price = IntegerField("Set a Target Price", validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField()
+
 """
 Endpoints
 """
-
-
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # Access the global URL
+    global URL
 
     if session.get("user_id") is None:
         return redirect("/login")
@@ -68,39 +74,71 @@ def index():
     # If form is validated successfully
     if form.validate_on_submit():
         item_url = form.item_url.data
+        URL = item_url
         form.item_url.data = ""
 
     # If we have item_url on our hand, then scrap the shit out of it
-    if item_url is not None:
-        # Get ready with the scrapper
-        scrapper = Scraper(item_url)
-
-        # If we couldn't scrap, then we have some error
-        if not scrapper.is_active:
-            return render_template("error.html", error="Couldn't parse the URL")
-
-        # Else save the data we get, and show results
-        data = scrapper.get()
-
-        # Format the data
-        data, image, price = format_data(data)
-        # Log that we successfully fetched the data
-        logger.info(f"Data successfully fetched - data: {data['title'].strip()}")
-
-        # Add the url of the product to the data
-        data['url'] = item_url
-
-        # Save the data to the database
-        if write_to_database(data=data, user_id=session["user_id"], price=price, image=image):
-            logger.info("Data saved to database successfully")
-
-        # Remove the url attribute
-        del data['url']
-
-        return render_template("results.html", data=data, image=image, price=price)
+    if item_url is not None and len(URL) != 0:
+        return redirect("/results")
 
     # If we don't have any url, then just show the base index page
     return render_template("index.html", item_url=item_url, form=form)
+
+
+"""
+Endpoint for results
+"""
+@app.route("/results", methods=["GET", "POST"])
+def get_results():
+    # Access the global URL
+    global URL
+
+    # Target price form
+    target_price = None
+    targetPriceForm = TargetPriceForm()
+
+    # If form is validated successfully
+    if targetPriceForm.validate_on_submit():
+        target_price = targetPriceForm.target_price.data
+        targetPriceForm.target_price.data = ""
+    
+    # If the URL is empty then, alert the user
+    if len(URL) == 0:
+        return render_template("error.html", title="Invalid Routed Page", heading="No Item's URL was found", error="The URL couldn't be parsed — Try again")
+
+    # Get ready with the scrapper
+    scrapper = Scraper(URL)
+
+    # If we couldn't scrap, then we have some error
+    if not scrapper.is_active:
+        return render_template("error.html", title="Scraper Error", heading="Scraper not working", error="Couldn't parse the URL")
+
+    # Else save the data we get, and show results
+    data = scrapper.get()
+
+    # Format the data
+    data, image, price = format_data(data)
+    # Log that we successfully fetched the data
+    logger.info(f"Data successfully fetched - data: {data['title'].strip()}")
+
+    # Add the url of the product to the data
+    data['url'] = URL
+
+    # Save the data to the database
+    if target_price is not None:
+        data['target_price'] = target_price
+        if write_to_database(data=data, user_id=session["user_id"], price=price, image=image):
+            logger.info("Data saved to database successfully")
+
+        if data['target_price'] is not None:
+            # Alert the user that they've successfully subscribed to the item
+            return render_template("confirm.html", title="Action Successful!", heading="Item is now being tracked!", message=f"The requested item ({data['title']}) is now being tracked")
+
+    # Remove the url attribute
+    del data['url']
+
+    return render_template("results.html", data=data, image=image, price=price, form=targetPriceForm)
+
 
 
 """
@@ -215,12 +253,12 @@ Error handlers
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template("404.html"), 404
+    return render_template("error.html", title="404 Not Found", heading="Error - Page not found!", error="Page you're looking for is not available"), 404
 
 
 @app.errorhandler(500)
-def page_not_found(e):
-    return render_template("500.html"), 500
+def internal_server_error(e):
+    return render_template("error.html", title="500 Internal Server Error", heading="Error - Internal Server Error", error="There is some issue with the server"), 500
 
 
 if __name__ == "__main__":

@@ -22,6 +22,10 @@ def write_to_database(data: dict, user_id: str, price: str, image: str):
         else:
             product.latest_price = price
             product.image = image
+        
+        # If we also have a target price, then update it
+        if data.get("target_price") is not None:
+            product.target_price = data["target_price"]
 
         try:
             db.session.commit()
@@ -55,6 +59,7 @@ def write_to_database(data: dict, user_id: str, price: str, image: str):
         url=data["url"],
         title=data["title"],
         latest_price=price,
+        target_price=data.get("target_price"),
         image=image,
     )
     db.session.add(new_product)

@@ -28,6 +28,7 @@ class Products(db.Model):
     user_id = db.Column(db.String(32), nullable=False)
     title = db.Column(db.String(345), nullable=False, unique=True)
     latest_price = db.Column(db.Integer, nullable=False, default=0)
+    target_price = db.Column(db.Integer, nullable=True)
     image = db.Column(db.Text, nullable=False)
     date_added = db.Column(db.DateTime, default=now)
 

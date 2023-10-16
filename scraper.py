@@ -14,7 +14,16 @@ AMAZON_ITEMS = {
 class Scraper:
     # Headers for the request
     HEADERS = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
+        "Sec-Ch-Ua": '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
+        "Sec-Ch-Ua-Mobile":  "?0",
+        "Sec-Ch-Ua-Platform": "Windows",
+        "Sec-Ch-Ua-Platform-Version": "10.0.0",
+        "Sec-Ch-Viewport-Width": "1000",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-User": "?1"
     }
 
     # Initialize the beautiful soup
