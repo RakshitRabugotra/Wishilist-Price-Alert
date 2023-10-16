@@ -45,6 +45,9 @@ class Scraper:
         # Log the content
         logger.info(f"CONTENT for url={url}: \n{self.soup.prettify('utf-8')}")
 
+        # Log the header
+        logger.info(f"HEADERS = {str(request_object.headers)}")
+
         # The scrapper is active
         self.is_active = True
 
