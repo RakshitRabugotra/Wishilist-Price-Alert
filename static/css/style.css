@@ -37,6 +37,7 @@ body {
   align-items: center;
   justify-content: space-between;
   background: var(--color-4);
+  overflow: auto;
 }
 
 .important {
@@ -69,7 +70,6 @@ body {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  height: 95vh;
   width: 100%;
   padding: 0px 1rem;
 }
@@ -126,6 +126,11 @@ a.href-btn {
 /* Image holder */
 .item-image-holder img {
   border-radius: 8px;
+  margin: 0.6rem 0px;
+}
+
+.form {
+  width: 100%;
 }
 
 .form form {
@@ -155,7 +160,8 @@ a.href-btn {
 
 input[type="text"], 
 input[type="password"],
-input[type="email"] {
+input[type="email"],
+input[type="number"] {
   font-size: var(--fs-3);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--color-1);

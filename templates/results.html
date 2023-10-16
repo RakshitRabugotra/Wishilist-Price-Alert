@@ -30,7 +30,13 @@
     </tbody>
   </table>
 
-  <button>Get updates</button>
+  <div class="form">
+    <form method="POST">
+      {{ form.hidden_tag() }} 
+      {{ form.target_price(placeholder="Set a Target Price") }} 
+      {{ form.submit(value="Get Updates") }}
+    </form>
+  </div>
 </div>
 
 {% else %} 
