@@ -1,11 +1,11 @@
 {% extends "layout/default.html" %} 
 
 {% block title %}
-Error
+{{ title }}
 {% endblock %}
 
 {% block content%}
-    <h1 class="heading">Error while serving your request</h1>
+    <h1 class="heading">{{heading}}</h1>
     <p class="important">
         {{error}}, Go <a href="/">Home</a>
     </p>
