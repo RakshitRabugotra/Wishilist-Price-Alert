@@ -47,6 +47,8 @@ body {
   width: max-content;
   height: max-content;
   text-align: center;
+  text-wrap: wrap;
+  width: 100%;
   padding: 10px 24px;
 }
 

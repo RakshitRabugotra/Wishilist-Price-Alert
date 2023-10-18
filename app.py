@@ -127,6 +127,9 @@ def get_results():
     # Save the data to the database
     if target_price is not None:
         data['target_price'] = target_price
+
+        logger.info(f"DATA-DICT: {str(data)}")
+
         if write_to_database(data=data, user_id=session["user_id"], price=price, image=image):
             logger.info("Data saved to database successfully")
 

@@ -1,3 +1,4 @@
+import time, random
 import requests
 from bs4 import BeautifulSoup
 from logger import logger
@@ -15,7 +16,7 @@ class Scraper:
     # Headers for the request
     HEADERS = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
-        "Cookie": "session-id=260-7242982-5061968; session-id-time=2082787201l; i18n-prefs=INR; ubid-acbin=258-6130774-6861324; session-token=qKWQQoYFXt0Utzldk9NTuV0gZz+XmB70/mcHrIz/UQweVKqPR2yIqX0wjNQwd2Jsn9EaH5TsuFpFSNrvrBipLgdYVQxcm81URgZaj/NH5wfcaX6g1sf/ML31KWmu3gfr/d808xu4IkBm3w4rE8yWjdUobh3c3CsjB27q0FVbfLfg1DltV6nUQF0mhkgc9N+Q8vhVuWcEGjmXCyvIWOl2d/AF4Yf0SMudtw+MqSTd6j1JBUsDHEZvMIBVR6JPwC60RCAaDhQGnbkgB0oRmgrdmci1Zvov1QmHAbm+tPNq/iV2SqiMg+6R8acF2K+kQW2f37vhyeS1vgfa021+lSFRhs/o0La48HnH; csm-hit=tb:s-1KAC8EJTFGTY9TR3SVWH|1697455375528&t:1697455380118&adb:adblk_no",
+        "Cookie": "session-id=260-7242982-5061968; session-id-time=2082787201l; i18n-prefs=INR; ubid-acbin=258-6130774-6861324; session-token=qKWQQoYFXt0Utzldk9NTuV0gZz+XmB70/mcHrIz/UQweVKqPR2yIqX0wjNQwd2Jsn9EaH5TsuFpFSNrvrBipLgdYVQxcm81URgZaj/NH5wfcaX6g1sf/ML31KWmu3gfr/d808xu4IkBm3w4rE8yWjdUobh3c3CsjB27q0FVbfLfg1DltV6nUQF0mhkgc9N+Q8vhVuWcEGjmXCyvIWOl2d/AF4Yf0SMudtw+MqSTd6j1JBUsDHEZvMIBVR6JPwC60RCAaDhQGnbkgB0oRmgrdmci1Zvov1QmHAbm+tPNq/iV2SqiMg+6R8acF2K+kQW2f37vhyeS1vgfa021+lSFRhs/o0La48HnH; csm-hit={}",
         "Sec-Ch-Ua": '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
         "Sec-Ch-Ua-Mobile":  "?0",
         "Sec-Ch-Ua-Platform": "Windows",
@@ -36,6 +37,10 @@ class Scraper:
     def __init__(self, url: str):
         self.url = url
         # Fetch using request
+
+        # Before making a request, we will update the headers
+        self.HEADERS['Cookie'] = self.HEADERS['Cookie'].format(f"tb:s-TXQXCC2MDXE6HT{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}E8Z2J|{int(time.time())}&t:{int(time.time()+10)}&adb:adblk_no")
+
         request_object = requests.get(url=url, headers=self.HEADERS)
         # Get the content
         self.content = request_object.content
@@ -43,11 +48,8 @@ class Scraper:
         # Make a soup object
         self.soup = BeautifulSoup(self.content, "html5lib")
 
-        # Log the content
-        logger.info(f"CONTENT for url={url}: \n{self.soup.prettify('utf-8')}")
-
         # Log the header
-        logger.info(f"HEADERS = {str(request_object.headers)}")
+        logger.info(f"HEADERS={str(request_object.headers)}")
 
         # The scrapper is active
         self.is_active = True
@@ -111,3 +113,28 @@ class Scraper:
                 results[field_name] = result_object.text
 
         return results
+
+
+
+if __name__ == '__main__':
+
+    from utils import format_data
+
+    # Test scenario
+    url = "https://www.amazon.in/Redmi-Black-256GB-Indias-Snapdragon/dp/B0C9JDHZTB/?_encoding=UTF8&_ref=dlx_gate_sd_dcl_tlt_bcfee803_dt&pd_rd_w=yWs7d&content-id=amzn1.sym.664f7b11-e5a2-4dd5-8d0d-db35e8ab3481&pf_rd_p=664f7b11-e5a2-4dd5-8d0d-db35e8ab3481&pf_rd_r=0QPBNNNFCJ1GEQW4C4Q4&pd_rd_wg=pwb4U&pd_rd_r=ee8ffb39-7e26-49ae-997b-1b5547e5d0ec&ref_=pd_gw_unk&th=1"
+
+    for i in range(0, 10):
+        
+        scraper = Scraper(url)
+
+
+        data = scraper.get()
+        data, image, price = format_data(data)
+
+        print(data)
+
+        break
+        time.sleep(2)
+
+    
+

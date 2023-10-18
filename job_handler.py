@@ -1,7 +1,27 @@
-from models import now, get_uuid, db, Products, PriceHistory
+from models import now, get_uuid, db, Products, User, PriceHistory
 from logger import logger
 from scraper import Scraper
+from mail import Mail, os
 from utils import format_data, format_price
+
+
+def send_alert_mail(user: User, product: dict):
+    # Content
+    content = ""
+    fields = []
+    
+    for field_name in product:
+        if field_name == "id": continue
+        content += f"{field_name.replace('_', ' ').capitalize()}: {str(product[field_name]).capitalize()}\n"
+    
+    logger.info(f"Sending email with content={content}")
+
+    # Send an alert E-mail
+    mail_object = Mail(os.environ["EMAIL_ADDRESS"], os.environ["EMAIL_PASSWD"])
+    mail_object.send_mail("Alert! - Price drop on item you're tracking!", user.email, content)
+
+    logger.info(f"E-mail sent to={user.email}, successfully")
+
 
 def write_to_database(data: dict, user_id: str, price: str, image: str):
     """
@@ -16,16 +36,31 @@ def write_to_database(data: dict, user_id: str, price: str, image: str):
 
     # Check if the product is already listed in the table
     if product is not None:
+
+        # Last price
+        last_price: int = product.latest_price
+        # New-price of the item
+        new_price: int = 0
+        # The target-price
+        target_price: int = product.target_price
+
+        # The user of this product
+        user: User = User.query.filter_by(id=product.user_id).first()
+
         # If the item becomes unavailable, then set the price to 0
         if "unavailable" in data['availability'].lower():
             product.latest_price = 0
+            new_price = 0
         else:
+            new_price = price
             product.latest_price = price
             product.image = image
         
         # If we also have a target price, then update it
         if data.get("target_price") is not None:
             product.target_price = data["target_price"]
+
+        logger.info(f"DATA-WRITE-TO-DB: {str(data)}")
 
         try:
             db.session.commit()
@@ -49,6 +84,13 @@ def write_to_database(data: dict, user_id: str, price: str, image: str):
             db.session.add(new_history)
             # Save the changes permanently
             db.session.commit()
+
+            # Check if the price has changed
+            if target_price * (0.95) < new_price < target_price * (1.05):
+                content_data = Products.serialize(product)
+                del content_data['image']
+                del content_data['user_id']
+                send_alert_mail(user, content_data)
 
             return success
         
@@ -118,6 +160,10 @@ def fetch_routine():
         if not scrapper.is_active:
             logger.error("Couldn't initialize the scrapper successfully")
             return 
+        
+        # The product user
+        cursor.execute("SELECT * FROM users WHERE id LIKE ?", (product['user_id'],))
+        user = cursor.fetchone()
 
         # Else save the data we get, and show results
         data = scrapper.get()
@@ -139,6 +185,9 @@ def fetch_routine():
         command = f"INSERT INTO priceHistory (history_id, product_id, price, date) VALUES(?, ?, ?, ?)"
         cursor.execute(command, (get_uuid(), product['id'], price, now()))
         logger.info(f"Update history for product_id={product['id']}, price={price}")
+
+        if True:
+            send_alert_mail(user, product)
 
         # Commit the changes
         sqliteConnection.commit()

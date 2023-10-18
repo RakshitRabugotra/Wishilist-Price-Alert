@@ -19,6 +19,15 @@ class User(db.Model):
     username = db.Column(db.String(30), nullable=False)
     password = db.Column(db.Text, nullable=False)
 
+    # Serializes the object
+    @staticmethod
+    def serialize(user) -> dict:
+        return {
+            "id": user.id,
+            "email": user.email,
+            "username": user.username,
+        }
+
 
 # Model for Products
 class Products(db.Model):
@@ -39,6 +48,20 @@ class Products(db.Model):
         """
         return ['id', 'url', 'user_id', 'title', 'latest_price', 'image', 'date_added']
 
+    # Serializes the object
+    @staticmethod
+    def serialize(product) -> dict:
+        return {
+            "id": product.id,
+            "url": product.url,
+            "user_id": product.user_id,
+            "title": product.title,
+            "latest_price": product.latest_price,
+            "target_price": product.target_price,
+            "image": product.image,
+            "date_added": product.date_added
+        }
+
 
 # Model to store all the products price history
 class PriceHistory(db.Model):
@@ -54,3 +77,14 @@ class PriceHistory(db.Model):
         Returns all of the fields used in here
         """
         return ['history_id', 'product_id', 'date', 'price']
+    
+
+    # Serializes the object
+    @staticmethod
+    def serialize(productHistory) -> dict:
+        return {
+            "history_id": productHistory.history_id,
+            "product_id": productHistory.product_id,
+            "date": productHistory.data,
+            "price": productHistory.price,
+        }
