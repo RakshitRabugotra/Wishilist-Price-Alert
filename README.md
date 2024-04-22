@@ -28,3 +28,6 @@ $ python -m pip install -r requirements.txt --upgrade
 ```console
 $ python app.py
 ```
+
+## Open the page
+By default goto http://localhost:5000 and you should see the project running there.
