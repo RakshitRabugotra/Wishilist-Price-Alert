@@ -1,4 +1,9 @@
 # Amazon Wishlist
+
+## Technologies Used
++ ### Flask
++ ### HTML + CSS
+
 ## Development
 Add a python virtual environment to the root directory same level as `app.py`. 
 ```console
