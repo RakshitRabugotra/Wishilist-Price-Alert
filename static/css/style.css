@@ -29,6 +29,10 @@
   padding: 0px;
 }
 
+html {
+  background: var(--color-4);
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -37,6 +41,8 @@ body {
   align-items: center;
   justify-content: space-between;
   background: var(--color-4);
+  max-width: 1024px;
+  margin-inline: auto;
   overflow: auto;
 }
 
