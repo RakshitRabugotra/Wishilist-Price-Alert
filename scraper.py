@@ -1,4 +1,5 @@
-import time, random
+import time
+import random
 import requests
 from bs4 import BeautifulSoup
 from logger import logger
@@ -34,10 +35,6 @@ class Scraper:
     def __init__(self, url: str):
         self.url = url
         # Fetch using request
-
-        # Before making a request, we will update the headers
-        self.HEADERS['Cookie'] = self.HEADERS['Cookie'].format(f"tb:s-TXQXCC2MDXE6HT{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}E8Z2J|{int(time.time())}&t:{int(time.time()+10)}&adb:adblk_no")
-
         request_object = requests.get(url=url, headers=self.HEADERS)
         # Get the content
         self.content = request_object.content
@@ -58,11 +55,11 @@ class Scraper:
             id_specifier_index = html_element.find("#")
             # First occurrence of Class specifier '.'
             class_specifier_index = html_element.find(".")
-            
+
             # Get the class of the element
             element_classes = None
             if class_specifier_index > 0:
-                element_classes = html_element[class_specifier_index + 1 :].replace(
+                element_classes = html_element[class_specifier_index + 1:].replace(
                     ".", " "
                 )
 
@@ -70,7 +67,7 @@ class Scraper:
             element_id = None
             if id_specifier_index > 0:
                 element_id = html_element[
-                    id_specifier_index + 1 : (class_specifier_index == -1)
+                    id_specifier_index + 1: (class_specifier_index == -1)
                     and len(html_element)
                     or class_specifier_index
                 ]
@@ -94,7 +91,8 @@ class Scraper:
                 del attrs["class"]
 
             # Log the details
-            logger.info(f"Searching for: 'field': {field_name} | 'attrs': {str(attrs)}")
+            logger.info(f"Searching for: 'field': {
+                        field_name} | 'attrs': {str(attrs)}")
 
             # Search for this element and return the result to results
             result_object = self.soup.find(element_type, attrs=attrs)
@@ -112,7 +110,6 @@ class Scraper:
         return results
 
 
-
 if __name__ == '__main__':
 
     from utils import format_data
@@ -121,9 +118,8 @@ if __name__ == '__main__':
     url = "https://www.amazon.in/Redmi-Black-256GB-Indias-Snapdragon/dp/B0C9JDHZTB/?_encoding=UTF8&_ref=dlx_gate_sd_dcl_tlt_bcfee803_dt&pd_rd_w=yWs7d&content-id=amzn1.sym.664f7b11-e5a2-4dd5-8d0d-db35e8ab3481&pf_rd_p=664f7b11-e5a2-4dd5-8d0d-db35e8ab3481&pf_rd_r=0QPBNNNFCJ1GEQW4C4Q4&pd_rd_wg=pwb4U&pd_rd_r=ee8ffb39-7e26-49ae-997b-1b5547e5d0ec&ref_=pd_gw_unk&th=1"
 
     for i in range(0, 10):
-        
-        scraper = Scraper(url)
 
+        scraper = Scraper(url)
 
         data = scraper.get()
         data, image, price = format_data(data)
@@ -132,6 +128,3 @@ if __name__ == '__main__':
 
         break
         time.sleep(2)
-
-    
-
