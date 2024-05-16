@@ -5,6 +5,11 @@
 + ### HTML + CSS
 
 ## Development
+Clone the repository
+```console
+$ git clone https://github.com/RakshitRabugotra/amazon-wishlist.git
+```
+
 Add a python virtual environment to the root directory same level as `app.py`. 
 ```console
 $ python -m venv venv
