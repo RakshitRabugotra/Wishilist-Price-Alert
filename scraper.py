@@ -16,16 +16,13 @@ class Scraper:
     # Headers for the request
     HEADERS = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
-        "Cookie": "session-id=260-7242982-5061968; session-id-time=2082787201l; i18n-prefs=INR; ubid-acbin=258-6130774-6861324; session-token=qKWQQoYFXt0Utzldk9NTuV0gZz+XmB70/mcHrIz/UQweVKqPR2yIqX0wjNQwd2Jsn9EaH5TsuFpFSNrvrBipLgdYVQxcm81URgZaj/NH5wfcaX6g1sf/ML31KWmu3gfr/d808xu4IkBm3w4rE8yWjdUobh3c3CsjB27q0FVbfLfg1DltV6nUQF0mhkgc9N+Q8vhVuWcEGjmXCyvIWOl2d/AF4Yf0SMudtw+MqSTd6j1JBUsDHEZvMIBVR6JPwC60RCAaDhQGnbkgB0oRmgrdmci1Zvov1QmHAbm+tPNq/iV2SqiMg+6R8acF2K+kQW2f37vhyeS1vgfa021+lSFRhs/o0La48HnH; csm-hit={}",
-        "Sec-Ch-Ua": '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
         "Sec-Ch-Ua-Mobile":  "?0",
         "Sec-Ch-Ua-Platform": "Windows",
         "Sec-Ch-Ua-Platform-Version": "10.0.0",
         "Sec-Ch-Viewport-Width": "1000",
         "Sec-Fetch-Dest": "document",
         "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "same-origin",
-        "Sec-Fetch-User": "?1"
+        "Sec-Fetch-Site": "same-origin"
     }
 
     # Initialize the beautiful soup
